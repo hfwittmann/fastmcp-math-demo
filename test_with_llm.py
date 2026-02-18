@@ -35,7 +35,7 @@ os.environ["GEMINI_API_KEY"] = os.environ.get("GOOGLE_API_KEY", "")
 # Model aliases - litellm uses "provider/model" format
 MODELS = {
     "gemini": "gemini/gemini-2.5-flash",
-    "openai": "gpt-4o-mini",
+    "openai": "openai/gpt-4o-mini",
 }
 
 OUTPUT_FILE = Path("llm_context_windows_llm.md")
@@ -160,6 +160,7 @@ async def test_math(model_name: str):
                         "tool_calls": [
                             {
                                 "id": tc.id,
+                                "type": "function",
                                 "function": {
                                     "name": tc.function.name,
                                     "arguments": tc.function.arguments,
@@ -216,6 +217,7 @@ async def test_math(model_name: str):
                                 "tool_calls": [
                                     {
                                         "id": tc.id,
+                                        "type": "function",
                                         "function": {
                                             "name": tc.function.name,
                                             "arguments": tc.function.arguments,

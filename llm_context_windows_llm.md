@@ -1,13 +1,13 @@
 # LLM Context Windows (test_with_llm.py)
 
-Generated: 2026-02-18T22:05:55.491726
+Generated: 2026-02-18T22:57:34.015382
 
 Query: Calculate 15 + 27, then multiply the result by 3, then subtract 50, then divide by 2
 
-Model: gemini/gemini-2.5-flash
+Model: openai/gpt-4o-mini
 
 
-## Turn 5 (final)
+## Turn 4 (final)
 
 ### Full Conversation History
 ### Messages
@@ -18,7 +18,7 @@ Calculate 15 + 27, then multiply the result by 3, then subtract 50, then divide 
 
 **ASSISTANT**
 ```
-tool_call: add({"b": 27, "a": 15})
+tool_call: add({"a":15,"b":27})
 ```
 
 **TOOL**
@@ -33,6 +33,9 @@ tool_response: 42.0
 ```
 tool_call: multiply({"a": 42, "b": 3})
 ```
+```
+tool_call: subtract({"a": 42, "b": 50})
+```
 
 **TOOL**
 ```
@@ -42,30 +45,25 @@ tool_call: multiply({"a": 42, "b": 3})
 tool_response: 126.0
 ```
 
-**ASSISTANT**
-```
-tool_call: subtract({"b": 50, "a": 126})
-```
-
 **TOOL**
 ```
-76.0
+-8.0
 ```
 ```
-tool_response: 76.0
+tool_response: -8.0
 ```
 
 **ASSISTANT**
 ```
-tool_call: divide({"a": 76, "b": 2})
+tool_call: divide({"a":126,"b":2})
 ```
 
 **TOOL**
 ```
-38.0
+63.0
 ```
 ```
-tool_response: 38.0
+tool_response: 63.0
 ```
 
 ### Available Tools

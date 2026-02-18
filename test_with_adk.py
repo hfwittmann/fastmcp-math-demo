@@ -29,6 +29,7 @@ from google.adk.models.llm_response import LlmResponse
 from google.adk.sessions import InMemorySessionService
 from google.adk.tools.mcp_tool import McpToolset
 from google.adk.tools.mcp_tool.mcp_session_manager import StdioConnectionParams
+from google.adk.models.lite_llm import LiteLlm
 from google.genai import types
 from mcp import StdioServerParameters
 
@@ -145,8 +146,14 @@ async def test_math_with_adk(model_name: str):
     )
 
     # Define the model to use
-    model = "gemini-2.5-flash" if model_name == "gemini" else "gpt-4o-mini"
-    print(f"Using model: {model}")
+    if model_name == "gemini":
+        model = LiteLlm(model="gemini/gemini-2.5-flash")
+        display_model = "gemini-2.5-flash"
+    else:
+        model = LiteLlm(model="openai/gpt-4o-mini")
+        display_model = "gpt-4o-mini"
+
+    print(f"Using model: {display_model}")
 
     # Create the agent with the MCP tools
     # ADK will automatically decide when to call tools based on the prompt
@@ -206,7 +213,7 @@ async def test_math_with_adk(model_name: str):
         output.append(f"# LLM Context Windows\n")
         output.append(f"Generated: {datetime.now().isoformat()}\n")
         output.append(f"Query: {query}\n")
-        output.append(f"Model: {model}\n")
+        output.append(f"Model: {display_model}\n")
         output.append("")
         output.append(final_window)
 

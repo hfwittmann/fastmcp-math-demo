@@ -1,13 +1,13 @@
 # LLM Context Windows
 
-Generated: 2026-02-18T22:00:49.431141
+Generated: 2026-02-18T22:58:30.064907
 
 Query: Calculate 15 + 27, then multiply the result by 3, then subtract 50, then divide by 2
 
-Model: gemini-2.5-flash
+Model: gpt-4o-mini
 
 
-## Turn 5
+## Turn 4 (final)
 
 ### System Instruction
 ```
@@ -24,7 +24,7 @@ Calculate 15 + 27, then multiply the result by 3, then subtract 50, then divide 
 
 **MODEL**
 ```
-function_call: add({"b": 27, "a": 15})
+function_call: add({"a": 15, "b": 27})
 ```
 
 **USER**
@@ -36,30 +36,26 @@ function_response: {'content': [{'type': 'text', 'text': '42.0'}], 'structuredCo
 ```
 function_call: multiply({"a": 42, "b": 3})
 ```
+```
+function_call: subtract({"a": 42, "b": 50})
+```
 
 **USER**
 ```
 function_response: {'content': [{'type': 'text', 'text': '126.0'}], 'structuredContent': {'result': 126.0}, 'isError': False}
 ```
-
-**MODEL**
 ```
-function_call: subtract({"b": 50, "a": 126})
-```
-
-**USER**
-```
-function_response: {'content': [{'type': 'text', 'text': '76.0'}], 'structuredContent': {'result': 76.0}, 'isError': False}
+function_response: {'content': [{'type': 'text', 'text': '-8.0'}], 'structuredContent': {'result': -8.0}, 'isError': False}
 ```
 
 **MODEL**
 ```
-function_call: divide({"a": 76, "b": 2})
+function_call: divide({"a": 126, "b": 2})
 ```
 
 **USER**
 ```
-function_response: {'content': [{'type': 'text', 'text': '38.0'}], 'structuredContent': {'result': 38.0}, 'isError': False}
+function_response: {'content': [{'type': 'text', 'text': '63.0'}], 'structuredContent': {'result': 63.0}, 'isError': False}
 ```
 
 ### Available Tools
