@@ -1,0 +1,32 @@
+meta {
+  name: Add
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8000/mcp
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json, text/event-stream
+  mcp-session-id: {{sessionId}}
+}
+
+body:json {
+  {
+    "jsonrpc": "2.0",
+    "id": 3,
+    "method": "tools/call",
+    "params": {
+      "name": "add",
+      "arguments": {
+        "a": 5,
+        "b": 3
+      }
+    }
+  }
+}

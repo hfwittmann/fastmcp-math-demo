@@ -1,0 +1,32 @@
+meta {
+  name: Multiply
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:8000/mcp
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json, text/event-stream
+  mcp-session-id: {{sessionId}}
+}
+
+body:json {
+  {
+    "jsonrpc": "2.0",
+    "id": 5,
+    "method": "tools/call",
+    "params": {
+      "name": "multiply",
+      "arguments": {
+        "a": 6,
+        "b": 7
+      }
+    }
+  }
+}

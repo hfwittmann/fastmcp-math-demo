@@ -1,0 +1,33 @@
+{
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "on",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "always"
+        }
+    },
+    "isort.args": [
+        "--profile",
+        "black",
+        "--settings-file",
+        ".isort.cfg"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.testing.autoTestDiscoverOnSaveEnabled": true,
+    "files.exclude": {
+        "**/.venv": true
+    },
+    "livePreview.defaultPreviewPath": "/cov_report_html/index.html",
+    "search.exclude": {
+        "**/.venv": true
+    },
+    "rainbowTags.allowEverywhere": true,
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportUnknownMemberType": "none",
+        "reportUnknownArgumentType": "none",
+        "reportUnknownVariableType": "none"
+    }
+}
