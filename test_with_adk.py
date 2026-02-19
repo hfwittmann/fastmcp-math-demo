@@ -15,7 +15,7 @@ import asyncio
 import json
 import os
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -33,75 +33,17 @@ from google.adk.models.lite_llm import LiteLlm
 from google.genai import types
 from mcp import StdioServerParameters
 
+from context_formatter import (
+    format_context_window,
+    convert_llm_request_to_messages,
+    convert_llm_request_to_tools,
+    get_system_instruction,
+)
+
 load_dotenv()
 
 # Output file for LLM context windows
 OUTPUT_FILE = Path("llm_context_windows_adk.md")
-
-
-def format_context_window(
-    llm_request: LlmRequest, turn_number: int, is_final: bool = False
-) -> str:
-    """Format a single LLM context window as markdown."""
-    title = f"Turn {turn_number}"
-    if is_final:
-        title += " (final)"
-    lines = []
-    lines.append(f"## {title}")
-    lines.append("")
-    if llm_request.config and llm_request.config.system_instruction:
-        lines.append("### System Instruction")
-        sys_inst = llm_request.config.system_instruction
-        if isinstance(sys_inst, str):
-            lines.append(f"```\n{sys_inst}\n```")
-        elif hasattr(sys_inst, "parts") and sys_inst.parts:  # type: ignore[union-attr]
-            for part in sys_inst.parts:  # type: ignore[union-attr]
-                if hasattr(part, "text") and part.text:
-                    lines.append(f"```\n{part.text}\n```")
-        lines.append("")
-
-    # Contents (conversation history)
-    history_label = (
-        "Full Conversation History" if turn_number > 1 else "Conversation History"
-    )
-    lines.append(f"### {history_label}")
-    for i, content in enumerate(llm_request.contents):
-        if not content.parts:  # type: ignore[union-attr]
-            continue
-        role = content.role or "unknown"
-        lines.append(f"**{role.upper()}**")
-        for part in content.parts:  # type: ignore[union-attr]
-            if hasattr(part, "text") and part.text:
-                lines.append(f"```\n{part.text}\n```")
-            if hasattr(part, "function_call") and part.function_call:
-                fc = part.function_call
-                lines.append(
-                    f"```\nfunction_call: {fc.name}({json.dumps(fc.args)})\n```"
-                )
-            if hasattr(part, "function_response") and part.function_response:
-                fr = part.function_response
-                lines.append(f"```\nfunction_response: {fr.response}\n```")
-        lines.append("")
-
-    # Tools
-    if llm_request.tools_dict:
-        lines.append("### Available Tools")
-        for name, tool in llm_request.tools_dict.items():
-            raw = getattr(tool, "raw_mcp_tool", None)
-            if raw and hasattr(raw, "inputSchema"):
-                lines.append(f"**{name}**")
-                lines.append(f"Description: {getattr(raw, 'description', 'N/A')}")
-                lines.append("")
-                lines.append(
-                    f"Parameters:\n```json\n{json.dumps(raw.inputSchema, indent=2)}\n```"
-                )
-            else:
-                desc = getattr(tool, "description", "N/A")
-                lines.append(f"**{name}**: {desc}")
-            lines.append("")
-        lines.append("")
-
-    return "\n".join(lines)
 
 
 # Global state to accumulate context windows
@@ -118,7 +60,14 @@ async def inspect_llm_request(
 
     turn_number = len(_llm_requests) + 1
     _llm_requests.append(llm_request)
-    formatted = format_context_window(llm_request, turn_number)
+
+    messages = convert_llm_request_to_messages(llm_request)
+    tools = convert_llm_request_to_tools(llm_request)
+    system_instruction = get_system_instruction(llm_request)
+
+    formatted = format_context_window(
+        turn_number, False, messages, tools, system_instruction
+    )
     _context_windows.append(formatted)
 
     print(f"\n[Captured context window for turn {turn_number}]")
@@ -206,8 +155,14 @@ async def test_math_with_adk(model_name: str):
     # Write final context window to file
     if _llm_requests:
         final_turn = len(_llm_requests)
+        last_request = _llm_requests[-1]
+
+        messages = convert_llm_request_to_messages(last_request)
+        tools = convert_llm_request_to_tools(last_request)
+        system_instruction = get_system_instruction(last_request)
+
         final_window = format_context_window(
-            _llm_requests[-1], final_turn, is_final=True
+            final_turn, True, messages, tools, system_instruction
         )
         output = []
         output.append(f"# LLM Context Windows\n")

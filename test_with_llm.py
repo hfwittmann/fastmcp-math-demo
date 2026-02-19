@@ -25,6 +25,8 @@ from litellm import acompletion
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
+from context_formatter import format_context_window
+
 # Load API keys from .env file
 load_dotenv()
 
@@ -39,45 +41,6 @@ MODELS = {
 }
 
 OUTPUT_FILE = Path("llm_context_windows_llm.md")
-
-
-def format_context_window(
-    messages: list, tools: list, response, turn: int, is_final: bool = False
-) -> str:
-    title = f"Turn {turn}"
-    if is_final:
-        title += " (final)"
-    lines = []
-    lines.append(f"## {title}")
-    lines.append("")
-
-    history_label = "Full Conversation History" if turn > 1 else "Conversation History"
-    lines.append(f"### {history_label}")
-    lines.append("### Messages")
-    for msg in messages:
-        role = msg.get("role", "unknown")
-        content = msg.get("content", "")
-        lines.append(f"**{role.upper()}**")
-        if content:
-            lines.append(f"```\n{content}\n```")
-        if "tool_calls" in msg and msg["tool_calls"]:
-            for tc in msg["tool_calls"]:
-                lines.append(
-                    f"```\ntool_call: {tc['function']['name']}({tc['function']['arguments']})\n```"
-                )
-        if "tool_call_id" in msg:
-            lines.append(f"```\ntool_response: {msg.get('content')}\n```")
-        lines.append("")
-
-    lines.append("### Available Tools")
-    for tool in tools:
-        func = tool.get("function", {})
-        lines.append(f"**{func.get('name')}**: {func.get('description')}")
-        lines.append("Parameters:")
-        lines.append(f"```json\n{json.dumps(func.get('parameters'), indent=2)}\n```")
-        lines.append("")
-
-    return "\n".join(lines)
 
 
 async def test_math(model_name: str):
@@ -142,7 +105,7 @@ async def test_math(model_name: str):
 
             query = messages[0]["content"]
             turn = 1
-            context_window = format_context_window(messages, mcp_tools, response, turn)
+            context_window = format_context_window(turn, False, messages, mcp_tools)
             print(f"\n[Captured context window for turn {turn}]")
 
             print(f"\nUser: {query}")
@@ -202,7 +165,7 @@ async def test_math(model_name: str):
                     )
 
                     context_window = format_context_window(
-                        messages, mcp_tools, response, turn
+                        turn, False, messages, mcp_tools
                     )
                     print(f"\n[Captured context window for turn {turn}]")
 
@@ -252,7 +215,7 @@ async def test_math(model_name: str):
 
                 # Write final context window to file
                 final_context_window = format_context_window(
-                    messages, mcp_tools, response, turn, is_final=True
+                    turn, True, messages, mcp_tools
                 )
                 output = []
                 output.append(f"# LLM Context Windows (test_with_llm.py)\n")

@@ -1,13 +1,13 @@
 # LLM Context Windows
 
-Generated: 2026-02-18T22:58:30.064907
+Generated: 2026-02-19T20:20:32.336459
 
 Query: Calculate 15 + 27, then multiply the result by 3, then subtract 50, then divide by 2
 
-Model: gpt-4o-mini
+Model: gemini-2.5-flash
 
 
-## Turn 4 (final)
+## Turn 5 (final)
 
 ### System Instruction
 ```
@@ -17,133 +17,160 @@ You are an agent. Your internal name is "math_agent".
 ```
 
 ### Full Conversation History
-**USER**
+```json
+[
+  {
+    "role": "user",
+    "content": "Calculate 15 + 27, then multiply the result by 3, then subtract 50, then divide by 2"
+  },
+  {
+    "role": "assistant",
+    "tool_calls": [
+      {
+        "function": {
+          "name": "add",
+          "arguments": "{'a': 15, 'b': 27}"
+        }
+      }
+    ]
+  },
+  {
+    "role": "tool",
+    "content": "{'content': [{'type': 'text', 'text': '42.0'}], 'structuredContent': {'result': 42.0}, 'isError': False}"
+  },
+  {
+    "role": "assistant",
+    "tool_calls": [
+      {
+        "function": {
+          "name": "multiply",
+          "arguments": "{'a': 42, 'b': 3}"
+        }
+      }
+    ]
+  },
+  {
+    "role": "tool",
+    "content": "{'content': [{'type': 'text', 'text': '126.0'}], 'structuredContent': {'result': 126.0}, 'isError': False}"
+  },
+  {
+    "role": "assistant",
+    "tool_calls": [
+      {
+        "function": {
+          "name": "subtract",
+          "arguments": "{'a': 126, 'b': 50}"
+        }
+      }
+    ]
+  },
+  {
+    "role": "tool",
+    "content": "{'content': [{'type': 'text', 'text': '76.0'}], 'structuredContent': {'result': 76.0}, 'isError': False}"
+  },
+  {
+    "role": "assistant",
+    "tool_calls": [
+      {
+        "function": {
+          "name": "divide",
+          "arguments": "{'a': 76, 'b': 2}"
+        }
+      }
+    ]
+  },
+  {
+    "role": "tool",
+    "content": "{'content': [{'type': 'text', 'text': '38.0'}], 'structuredContent': {'result': 38.0}, 'isError': False}"
+  }
+]
 ```
-Calculate 15 + 27, then multiply the result by 3, then subtract 50, then divide by 2
-```
-
-**MODEL**
-```
-function_call: add({"a": 15, "b": 27})
-```
-
-**USER**
-```
-function_response: {'content': [{'type': 'text', 'text': '42.0'}], 'structuredContent': {'result': 42.0}, 'isError': False}
-```
-
-**MODEL**
-```
-function_call: multiply({"a": 42, "b": 3})
-```
-```
-function_call: subtract({"a": 42, "b": 50})
-```
-
-**USER**
-```
-function_response: {'content': [{'type': 'text', 'text': '126.0'}], 'structuredContent': {'result': 126.0}, 'isError': False}
-```
-```
-function_response: {'content': [{'type': 'text', 'text': '-8.0'}], 'structuredContent': {'result': -8.0}, 'isError': False}
-```
-
-**MODEL**
-```
-function_call: divide({"a": 126, "b": 2})
-```
-
-**USER**
-```
-function_response: {'content': [{'type': 'text', 'text': '63.0'}], 'structuredContent': {'result': 63.0}, 'isError': False}
-```
-
 ### Available Tools
-**add**
-Description: Add two numbers together.
-
-Parameters:
 ```json
-{
-  "properties": {
-    "a": {
-      "type": "number"
-    },
-    "b": {
-      "type": "number"
+[
+  {
+    "function": {
+      "name": "add",
+      "description": "Add two numbers together.",
+      "parameters": {
+        "properties": {
+          "a": {
+            "type": "number"
+          },
+          "b": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "a",
+          "b"
+        ],
+        "type": "object"
+      }
     }
   },
-  "required": [
-    "a",
-    "b"
-  ],
-  "type": "object"
-}
-```
-
-**subtract**
-Description: Subtract b from a.
-
-Parameters:
-```json
-{
-  "properties": {
-    "a": {
-      "type": "number"
-    },
-    "b": {
-      "type": "number"
+  {
+    "function": {
+      "name": "subtract",
+      "description": "Subtract b from a.",
+      "parameters": {
+        "properties": {
+          "a": {
+            "type": "number"
+          },
+          "b": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "a",
+          "b"
+        ],
+        "type": "object"
+      }
     }
   },
-  "required": [
-    "a",
-    "b"
-  ],
-  "type": "object"
-}
-```
-
-**multiply**
-Description: Multiply two numbers together.
-
-Parameters:
-```json
-{
-  "properties": {
-    "a": {
-      "type": "number"
-    },
-    "b": {
-      "type": "number"
+  {
+    "function": {
+      "name": "multiply",
+      "description": "Multiply two numbers together.",
+      "parameters": {
+        "properties": {
+          "a": {
+            "type": "number"
+          },
+          "b": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "a",
+          "b"
+        ],
+        "type": "object"
+      }
     }
   },
-  "required": [
-    "a",
-    "b"
-  ],
-  "type": "object"
-}
-```
-
-**divide**
-Description: Divide a by b.
-
-Parameters:
-```json
-{
-  "properties": {
-    "a": {
-      "type": "number"
-    },
-    "b": {
-      "type": "number"
+  {
+    "function": {
+      "name": "divide",
+      "description": "Divide a by b.",
+      "parameters": {
+        "properties": {
+          "a": {
+            "type": "number"
+          },
+          "b": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "a",
+          "b"
+        ],
+        "type": "object"
+      }
     }
-  },
-  "required": [
-    "a",
-    "b"
-  ],
-  "type": "object"
-}
+  }
+]
 ```
-

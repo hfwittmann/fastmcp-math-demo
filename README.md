@@ -69,7 +69,57 @@ python test_with_adk.py --model openai
 3. Lists available tools (add, subtract, multiply, divide)
 4. Sends a math problem to the LLM with tool definitions
 5. The LLM decides to call a tool, the script executes it via MCP
-LM for final answer
+6. Returns the result to the LLM for final answer
+
+#### ADK Approach (test_with_adk.py)
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant A as Agent
+    participant L as LLM
+    participant T as MCP Tools
+
+    U->>A: "Calculate 15 + 27, then..."
+    A->>L: Send prompt + tool definitions
+    L-->>A: function_call: add(15, 27)
+    A->>T: Execute add(15, 27)
+    T-->>A: Result: 42.0
+    A->>L: Tool result: 42.0
+    L-->>A: function_call: multiply(42, 3)
+    A->>T: Execute multiply(42, 3)
+    T-->>A: Result: 126.0
+    A->>L: Tool result: 126.0
+    L-->>A: Final answer: 38.0
+    A-->>U: The answer is 38.0
+```
+
+ADK handles the tool calling loop automatically.
+
+#### Direct LLM Approach (test_with_llm.py)
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant S as Script
+    participant L as LLM
+    participant T as MCP Tools
+
+    U->>S: "Calculate 15 + 27, then..."
+    S->>L: Send prompt + tool definitions
+    L-->>S: function_call: add(15, 27)
+    S->>T: Execute add(15, 27)
+    T-->>S: Result: 42.0
+    S->>L: Tool result: 42.0
+    L-->>S: function_call: multiply(42, 3)
+    S->>T: Execute multiply(42, 3)
+    T-->>S: Result: 126.0
+    S->>L: Tool result: 126.0
+    L-->>S: Final answer: 38.0
+    S-->>U: The answer is 38.0
+```
+
+The script manually handles tool calling loop.
 
 ## LLM Context Inspection
 
