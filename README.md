@@ -25,18 +25,13 @@ python main.py
 python main.py --http --port 8000
 ```
 
-## Testing with Bruno
+## Testing the API with Bruno
 
 This project includes a [Bruno](https://www.usebruno.com/) collection for testing the MCP server via HTTP.
 
-1. Start the server in HTTP mode:
-   ```bash
-   python main.py --http
-   ```
+## LLM Tool Calling Simulations
 
-2. Open the Bruno collection in `bruno/math-server/` and run the requests.
-
-This project includes two test approaches:
+This project includes two simulations of LLM tool calling:
 
 ### 1. test_with_llm.py - Direct LLM Integration
 
