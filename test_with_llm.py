@@ -12,6 +12,7 @@ import argparse
 import asyncio
 import json
 import os
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -94,14 +95,19 @@ async def test_math(model_name: str):
             model = MODELS.get(model_name, model_name)
             print(f"\nUsing model: {model}")
 
+            total_start = time.perf_counter()
+
             # Call the LLM with the user message and available tools
             # tool_choice="auto" lets the model decide whether to use a tool
+            llm_start = time.perf_counter()
             response = await acompletion(
                 model=model,
                 messages=messages,
                 tools=mcp_tools,
                 tool_choice="auto",
             )
+            llm_elapsed = time.perf_counter() - llm_start
+            print(f"[LLM call took {llm_elapsed:.2f}s]")
 
             query = messages[0]["content"]
             turn = 1
@@ -141,9 +147,11 @@ async def test_math(model_name: str):
                     print(f"\nCalling tool: {tool_name}({tool_args})")
 
                     # Execute the tool via MCP and get result
+                    tool_start = time.perf_counter()
                     result = await session.call_tool(tool_name, tool_args)  # type: ignore[arg-type]
+                    tool_elapsed = time.perf_counter() - tool_start
                     tool_result_text = result.content[0].text  # type: ignore[union-attr]
-                    print(f"Result: {tool_result_text}")
+                    print(f"Result: {tool_result_text} ({tool_elapsed:.2f}s)")
 
                     # Add tool result to conversation
                     messages.append(  # type: ignore[arg-type]
@@ -157,12 +165,15 @@ async def test_math(model_name: str):
                 # Continue calling LLM with tool results until no more tool calls
                 while True:
                     turn += 1
+                    llm_start = time.perf_counter()
                     response = await acompletion(
                         model=model,
                         messages=messages,
                         tools=mcp_tools,
                         tool_choice="auto",
                     )
+                    llm_elapsed = time.perf_counter() - llm_start
+                    print(f"[LLM call took {llm_elapsed:.2f}s]")
 
                     context_window = format_context_window(
                         turn, False, messages, mcp_tools
@@ -197,9 +208,11 @@ async def test_math(model_name: str):
                             tool_args = json.loads(call.function.arguments)
                             print(f"\nCalling tool: {tool_name}({tool_args})")
 
+                            tool_start = time.perf_counter()
                             result = await session.call_tool(tool_name, tool_args)  # type: ignore[arg-type]
+                            tool_elapsed = time.perf_counter() - tool_start
                             tool_result_text = result.content[0].text  # type: ignore[union-attr]
-                            print(f"Result: {tool_result_text}")
+                            print(f"Result: {tool_result_text} ({tool_elapsed:.2f}s)")
 
                             messages.append(  # type: ignore[arg-type]
                                 {
@@ -212,6 +225,10 @@ async def test_math(model_name: str):
                         # LLM answered without more tool calls
                         print(f"\nAssistant: {assistant_message.content}")
                         break
+
+                total_elapsed = time.perf_counter() - total_start
+                print(f"\n{'=' * 50}")
+                print(f"Total execution time: {total_elapsed:.2f}s")
 
                 # Write final context window to file
                 final_context_window = format_context_window(

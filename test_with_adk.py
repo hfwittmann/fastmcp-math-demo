@@ -14,6 +14,7 @@ import argparse
 import asyncio
 import json
 import os
+import time
 from datetime import datetime
 from typing import Any, Optional
 from pathlib import Path
@@ -50,13 +51,16 @@ OUTPUT_FILE = Path("llm_context_windows_adk.md")
 _context_windows: list = []
 _llm_requests: list = []
 
+# Timing tracking
+_timings: list = []
+
 
 async def inspect_llm_request(
     callback_context: CallbackContext,
     llm_request: LlmRequest,
 ) -> Optional[LlmResponse]:
     """Callback to capture what's sent to the LLM."""
-    global _context_windows, _llm_requests
+    global _context_windows, _llm_requests, _timings
 
     turn_number = len(_llm_requests) + 1
     _llm_requests.append(llm_request)
@@ -135,6 +139,8 @@ async def test_math_with_adk(model_name: str):
     query = "Calculate 15 + 27, then multiply the result by 3, then subtract 50, then divide by 2"
     print(f"\nUser: {query}")
 
+    total_start = time.perf_counter()
+
     # Run the agent - ADK handles the tool calling loop automatically!
     # It will call tools as needed and return when done
     # Note: run_async returns an async generator, so we iterate over it
@@ -149,8 +155,12 @@ async def test_math_with_adk(model_name: str):
                 if part.text:
                     final_content = part.text
 
+    total_elapsed = time.perf_counter() - total_start
+
     # Print the final response
     print(f"\nAssistant: {final_content}")
+    print(f"\n{'=' * 50}")
+    print(f"Total execution time: {total_elapsed:.2f}s")
 
     # Write final context window to file
     if _llm_requests:
