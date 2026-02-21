@@ -44,8 +44,11 @@ The `agents/` directory contains two agent configurations:
 - `math_mcp/` - Uses MCP tools (via stdio)
 - `math_simple/` - Uses simple Python functions (no MCP)
 
-![Image 1: Tool call sequence for "Calculate 15 + 27, then multiply by 3, subtract 50, divide by 2"](mypics/SCR-20260221-pwet.png)
-![Image 2: Tool call sequence for "Calculate (3*(15 + 27) - 50)/2"](mypics/SCR-20260221-pynj.png)
+![Tool call sequence](mypics/SCR-20260221-pwet.png)
+**Image 1:** Tool call sequence for "Calculate 15 + 27, then multiply by 3, subtract 50, divide by 2"
+
+![Tool call sequence](mypics/SCR-20260221-pynj.png)
+**Image 2:** Tool call sequence for "Calculate (3*(15 + 27) - 50)/2"
 
 ## LLM Tool Calling Simulations
 
