@@ -102,10 +102,17 @@ def format_context_window(
     history_label = "Full Conversation History" if turn > 1 else "Conversation History"
     lines.append(f"### {history_label}")
 
+    assistant_count = 0
     for msg in messages:
         role = msg.get("role", "unknown")
         content = msg.get("content", "")
-        lines.append(f"**{role.upper()}**")
+        if role == "assistant":
+            assistant_count += 1
+            lines.append(f"**{role.upper()} {assistant_count}**")
+        elif role == "tool":
+            lines.append(f"**{role.upper()} {assistant_count}**")
+        else:
+            lines.append(f"**{role.upper()}**")
         if content:
             lines.append(f"```\n{content}\n```")
         if "tool_calls" in msg and msg["tool_calls"]:
